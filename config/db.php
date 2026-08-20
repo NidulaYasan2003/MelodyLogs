@@ -2,8 +2,8 @@
 // Database configuration parameters
 $host = 'localhost';
 $dbname = 'blog_db';
-$username = 'root'; // Default XAMPP username
-$password = '';     // Default XAMPP password is empty
+$username = 'root';         
+$password = '';     
 
 try {
     // Create a new PDO instance
