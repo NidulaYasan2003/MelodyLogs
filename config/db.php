@@ -1,22 +1,25 @@
 <?php
-// Database configuration parameters
-$host = 'localhost';
-$dbname = 'blog_db';
-$username = 'root';         
-$password = '';     
+declare(strict_types=1);
+
+require_once __DIR__ . '/env.php';
+
+$host    = getenv('DB_HOST') ?: 'localhost';
+$dbname  = getenv('DB_NAME') ?: 'blog_db';
+$user    = getenv('DB_USER') ?: 'root';
+$pass    = getenv('DB_PASS') ?: '';
+$charset = 'utf8mb4';
+
+$dsn = "mysql:host={$host};dbname={$dbname};charset={$charset}";
+
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
 
 try {
-    // Create a new PDO instance
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
-    
-    // Set error mode to exception so we can catch database errors
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-    // Set default fetch mode to associative array
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
+    $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (PDOException $e) {
-    // Stop execution and show error message if connection fails
-    die("Database Connection Failed: " . $e->getMessage());
+    error_log("Database Connection Failure: " . $e->getMessage());
+    die("Database connection failed. Please ensure MySQL is running in XAMPP.");
 }
-?>
