@@ -1,0 +1,13 @@
+# Environment Variables
+.env
+
+# Dependencies & Package Managers
+/vendor/
+/node_modules/
+
+# OS / Editor Artifacts
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log

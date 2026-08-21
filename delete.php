@@ -1,23 +1,66 @@
 <?php
-declare(strict_types=1);
+/**
+ * MelodyLogs - Post Deletion Handler
+ * Strictly deletes a post if ownership authorization passes
+ */
+require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/includes/functions.php';
 
-require_once 'config/db.php';
+// Authentication Guard
+require_auth();
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+// Enforce POST method with CSRF protection for safe state-modifying requests
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    set_flash('danger', 'Method Not Allowed. Deletion must be submitted via a verified form.');
+    header('Location: index.php');
     exit;
 }
 
-$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-
-if ($id) {
-    $stmt = $pdo->prepare("DELETE FROM blogPost WHERE id = ? AND user_id = ?");
-    $stmt->execute([$id, $_SESSION['user_id']]);
+if (!verify_csrf()) {
+    set_flash('danger', 'Security verification failed (Invalid CSRF Token).');
+    header('Location: index.php');
+    exit;
 }
 
-header("Location: index.php");
+$postId = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+$currentUserId = current_user_id();
+
+if ($postId <= 0) {
+    set_flash('danger', 'Invalid post ID provided.');
+    header('Location: index.php');
+    exit;
+}
+
+// 1. Verify existence and ownership
+$stmt = $pdo->prepare("SELECT id, user_id, title FROM posts WHERE id = :id LIMIT 1");
+$stmt->execute(['id' => $postId]);
+$post = $stmt->fetch();
+
+if (!$post) {
+    set_flash('warning', 'The post you attempted to delete does not exist.');
+    header('Location: index.php');
+    exit;
+}
+
+// 2. Strict Authorization Check
+if ((int)$post['user_id'] !== $currentUserId) {
+    set_flash('danger', 'Access Denied: You do not possess permission to delete this melody log.');
+    header('Location: index.php');
+    exit;
+}
+
+// 3. Execute Delete Query with dual-bound WHERE clause
+$deleteStmt = $pdo->prepare("DELETE FROM posts WHERE id = :id AND user_id = :user_id LIMIT 1");
+$success = $deleteStmt->execute([
+    'id'      => $postId,
+    'user_id' => $currentUserId
+]);
+
+if ($success && $deleteStmt->rowCount() > 0) {
+    set_flash('success', 'The Melody Log "' . $post['title'] . '" has been permanently deleted.');
+} else {
+    set_flash('danger', 'Failed to delete the log. Please try again.');
+}
+
+header('Location: index.php');
 exit;
