@@ -9,23 +9,23 @@ if (session_status() === PHP_SESSION_NONE) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MelodyLogs - Singers & Vocalists Platform</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=<?php echo time(); ?>">
 </head>
 <body>
-    <header>
-        <div class="nav-bar">
-            <a href="index.php" class="brand">🎵 MelodyLogs</a>
-            <div class="nav-links">
-                <a href="index.php">Home</a>
+    <header class="navbar">
+        <div class="container nav-container">
+            <a href="index.php" class="logo">🎵 MelodyLogs</a>
+            <ul class="nav-links">
+                <li><a href="index.php">Home</a></li>
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="editor.php">Create Entry</a>
-                    <span class="user-badge">Artist: <?= htmlspecialchars($_SESSION['username']) ?></span>
-                    <a href="logout.php">Logout</a>
+                    <li><a href="editor.php">Create Entry</a></li>
+                    <li><span class="user-welcome">Artist: <?= htmlspecialchars($_SESSION['username']) ?></span></li>
+                    <li><a href="logout.php" class="btn-logout">Logout</a></li>
                 <?php else: ?>
-                    <a href="login.php">Login</a>
-                    <a href="register.php" class="btn">Register</a>
+                    <li><a href="login.php">Login</a></li>
+                    <li><a href="register.php" class="btn">Register</a></li>
                 <?php endif; ?>
-            </div>
+            </ul>
         </div>
     </header>
-    <main class="main-content">
+    <main class="container">
