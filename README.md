@@ -67,6 +67,18 @@ Blog app/
 
 
 
+---
+
+## 🔧 Additional Features
+
+- **View Count Tracking**: Each post now records and displays the number of times it has been viewed, both on the post page and on the homepage cards.
+- **Google Sign-In**: Users can authenticate using their Google accounts via OAuth 2.0 (Google Identity Services).
+- **Favicon & Dark/Light Mode Toggle**: Added site-wide favicon and a button to switch between dark and light themes.
+- **Responsive UI Enhancements**: Fixed visibility issues for navigation elements in light mode and improved mobile responsiveness.
+
+
+---
+
 ## 🛡️ Security Audit Highlights
 
 - **SQL Injection**: Prevented using PDO prepared statements with parameter binding and disabled emulation (`PDO::ATTR_EMULATE_PREPARES => false`).
