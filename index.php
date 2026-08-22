@@ -177,9 +177,10 @@ require_once __DIR__ . '/includes/header.php';
                         <!-- Card Body -->
                         <div class="card-body-custom">
                             <div class="d-flex align-items-center gap-2 text-muted small mb-2">
-                                <span><i class="bi bi-clock me-1"></i> <?= $readTime ?></span>
-                                <span>•</span>
-                                <span><i class="bi bi-calendar3 me-1"></i> <?= format_date($post['created_at']) ?></span>
+                                 <span><i class="bi bi-clock me-1"></i> <?= $readTime ?></span>
+                                 <span>•</span>
+                                 <span><i class="bi bi-calendar3 me-1"></i> <?= format_date($post['created_at']) ?></span>
+                                 <span class="ms-2"><i class="bi bi-eye me-1"></i> <?= e($post['view_count']) ?> views</span>
                             </div>
 
                             <h2 class="card-title-custom">

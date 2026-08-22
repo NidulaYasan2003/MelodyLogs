@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS `posts` (
     `cover_image_url` VARCHAR(500) DEFAULT NULL,
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `view_count` INT DEFAULT 0,
     CONSTRAINT `fk_posts_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
     INDEX `idx_posts_user` (`user_id`),
     INDEX `idx_posts_category` (`category`),

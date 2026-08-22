@@ -34,6 +34,10 @@ if (!$post) {
     exit;
 }
 
+// Increment view count
+$viewStmt = $pdo->prepare('UPDATE posts SET view_count = view_count + 1 WHERE id = :id');
+$viewStmt->execute(['id' => $postId]);
+
 // Check if current user is the author or superadmin
 $canManage = is_logged_in() && ((current_user_id() === (int)$post['user_id']) || is_admin());
 
@@ -78,6 +82,7 @@ require_once __DIR__ . '/includes/header.php';
                     <span class="text-secondary small"><i class="bi bi-clock me-1"></i> <?= $readTime ?></span>
                     <span class="text-secondary small">•</span>
                     <span class="text-secondary small"><i class="bi bi-calendar3 me-1"></i> <?= format_date($post['created_at']) ?></span>
+<span class="text-secondary small ms-2"><i class="bi bi-eye me-1"></i> <?= e($post['view_count']) ?> views</span>
                 </div>
 
                 <h1 class="display-5 text-white fw-bold mb-3"><?= e($post['title']) ?></h1>
