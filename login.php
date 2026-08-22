@@ -31,18 +31,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute(['username' => $identifier, 'email' => $identifier]);
             $user = $stmt->fetch();
 
-            if ($user && password_verify($password, $user['password'])) {
+            if ($user && !empty($user['password']) && password_verify($password, $user['password'])) {
                 // Regenerate session ID to protect against session fixation
                 session_regenerate_id(true);
 
                 $_SESSION['user_id']    = (int)$user['id'];
                 $_SESSION['username']   = $user['username'];
                 $_SESSION['email']      = $user['email'];
+                $_SESSION['role']       = $user['role'] ?? 'user';
                 $_SESSION['vocal_type'] = $user['vocal_type'];
 
                 set_flash('success', "Welcome back, {$user['username']}! Great to have you on MelodyLogs.");
                 header('Location: index.php');
                 exit;
+            } elseif ($user && empty($user['password']) && !empty($user['google_id'])) {
+                $errors[] = 'This account uses Google Sign-In. Please click "Sign in with Google" below.';
             } else {
                 $errors[] = 'Invalid credentials. Please verify your username/email and password.';
             }
@@ -113,8 +116,38 @@ require_once __DIR__ . '/includes/header.php';
                         </button>
                     </div>
 
+                    <?php $googleClientId = env('GOOGLE_CLIENT_ID', ''); ?>
+                    <?php if (!empty($googleClientId)): ?>
+                    <!-- Divider -->
+                    <div class="d-flex align-items-center my-3">
+                        <hr class="flex-grow-1 border-secondary border-opacity-25">
+                        <span class="px-3 text-muted small">or continue with</span>
+                        <hr class="flex-grow-1 border-secondary border-opacity-25">
+                    </div>
+
+                    <!-- Google Sign-In -->
+                    <div id="g_id_onload"
+                         data-client_id="<?= e($googleClientId) ?>"
+                         data-login_uri="<?= e(env('APP_URL', 'http://localhost:8000')) ?>/google_callback.php"
+                         data-auto_prompt="false"
+                         data-context="signin"
+                         data-ux_mode="redirect">
+                    </div>
+                    <div class="d-grid">
+                        <div class="g_id_signin"
+                             data-type="standard"
+                             data-size="large"
+                             data-theme="outline"
+                             data-text="signin_with"
+                             data-shape="pill"
+                             data-logo_alignment="center"
+                             data-width="100%">
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
                     <!-- Switch to Register -->
-                    <p class="text-center text-secondary small mb-0">
+                    <p class="text-center text-secondary small mb-0 mt-3">
                         Don't have an account yet? 
                         <a href="register.php" class="text-primary text-decoration-none fw-semibold">Join MelodyLogs free</a>
                     </p>

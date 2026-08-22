@@ -1,7 +1,6 @@
 <?php
 /**
  * MelodyLogs - Post Deletion Handler
- * Strictly deletes a post if ownership authorization passes
  */
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/functions.php';
@@ -42,19 +41,24 @@ if (!$post) {
     exit;
 }
 
-// 2. Strict Authorization Check
-if ((int)$post['user_id'] !== $currentUserId) {
+// 2. Strict Authorization / Admin Check
+if ((int)$post['user_id'] !== $currentUserId && !is_admin()) {
     set_flash('danger', 'Access Denied: You do not possess permission to delete this melody log.');
     header('Location: index.php');
     exit;
 }
 
-// 3. Execute Delete Query with dual-bound WHERE clause
-$deleteStmt = $pdo->prepare("DELETE FROM posts WHERE id = :id AND user_id = :user_id LIMIT 1");
-$success = $deleteStmt->execute([
-    'id'      => $postId,
-    'user_id' => $currentUserId
-]);
+// 3. Execute Delete Query
+if (is_admin()) {
+    $deleteStmt = $pdo->prepare("DELETE FROM posts WHERE id = :id LIMIT 1");
+    $success = $deleteStmt->execute(['id' => $postId]);
+} else {
+    $deleteStmt = $pdo->prepare("DELETE FROM posts WHERE id = :id AND user_id = :user_id LIMIT 1");
+    $success = $deleteStmt->execute([
+        'id'      => $postId,
+        'user_id' => $currentUserId
+    ]);
+}
 
 if ($success && $deleteStmt->rowCount() > 0) {
     set_flash('success', 'The Melody Log "' . $post['title'] . '" has been permanently deleted.');
@@ -62,5 +66,6 @@ if ($success && $deleteStmt->rowCount() > 0) {
     set_flash('danger', 'Failed to delete the log. Please try again.');
 }
 
-header('Location: index.php');
+$redirectUrl = (isset($_POST['redirect']) && $_POST['redirect'] === 'admin' && is_admin()) ? 'admin.php' : 'index.php';
+header("Location: {$redirectUrl}");
 exit;

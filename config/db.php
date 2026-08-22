@@ -1,7 +1,6 @@
 <?php
 /**
  * MelodyLogs - Database Connection
- * PDO connection using dynamic environment variables
  */
 
 require_once __DIR__ . '/env.php';

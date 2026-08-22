@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * MelodyLogs - User Registration
+ */
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/functions.php';
 
@@ -60,8 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
             $insertStmt = $pdo->prepare("
-                INSERT INTO users (username, email, password, vocal_type, bio, created_at)
-                VALUES (:username, :email, :password, :vocal_type, :bio, NOW())
+                INSERT INTO users (username, email, password, role, vocal_type, bio, created_at)
+                VALUES (:username, :email, :password, 'user', :vocal_type, :bio, NOW())
             ");
 
             $success = $insertStmt->execute([
@@ -80,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user_id']    = $newUserId;
                 $_SESSION['username']   = $username;
                 $_SESSION['email']      = $email;
+                $_SESSION['role']       = 'user';
                 $_SESSION['vocal_type'] = $vocalType;
 
                 set_flash('success', "Welcome to MelodyLogs, {$username}! Your vocal journey begins now.");
@@ -194,8 +197,38 @@ require_once __DIR__ . '/includes/header.php';
                         </button>
                     </div>
 
+                    <?php $googleClientId = env('GOOGLE_CLIENT_ID', ''); ?>
+                    <?php if (!empty($googleClientId)): ?>
+                    <!-- Divider -->
+                    <div class="d-flex align-items-center my-3">
+                        <hr class="flex-grow-1 border-secondary border-opacity-25">
+                        <span class="px-3 text-muted small">or sign up with</span>
+                        <hr class="flex-grow-1 border-secondary border-opacity-25">
+                    </div>
+
+                    <!-- Google Sign-In -->
+                    <div id="g_id_onload"
+                         data-client_id="<?= e($googleClientId) ?>"
+                         data-login_uri="<?= e(env('APP_URL', 'http://localhost:8000')) ?>/google_callback.php"
+                         data-auto_prompt="false"
+                         data-context="signup"
+                         data-ux_mode="redirect">
+                    </div>
+                    <div class="d-grid">
+                        <div class="g_id_signin"
+                             data-type="standard"
+                             data-size="large"
+                             data-theme="outline"
+                             data-text="signup_with"
+                             data-shape="pill"
+                             data-logo_alignment="center"
+                             data-width="100%">
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
                     <!-- Switch to Login -->
-                    <p class="text-center text-secondary small mb-0">
+                    <p class="text-center text-secondary small mb-0 mt-3">
                         Already have an account? 
                         <a href="login.php" class="text-primary text-decoration-none fw-semibold">Sign in here</a>
                     </p>

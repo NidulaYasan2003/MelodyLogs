@@ -1,7 +1,6 @@
 <?php
 /**
  * MelodyLogs - Homepage & Feed
- * Displays hero section, category filters, search, and responsive post card grid
  */
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/functions.php';

@@ -1,4 +1,7 @@
 <?php
+/**
+ * MelodyLogs - Global Helper Functions
+ */
 
 // Start session if not active
 if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
@@ -9,7 +12,6 @@ if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
 }
 
 /**
- * Sanitize and escape string for HTML output (XSS prevention)
  *
  * @param mixed $value
  * @return string
@@ -25,6 +27,19 @@ function e(mixed $value): string {
  */
 function is_logged_in(): bool {
     return !empty($_SESSION['user_id']);
+}
+
+/**
+ * Check if the current user is an administrator / superadmin
+ *
+ * @return bool
+ */
+function is_admin(): bool {
+    if (!is_logged_in()) {
+        return false;
+    }
+    $role = $_SESSION['role'] ?? 'user';
+    return in_array($role, ['admin', 'superadmin'], true);
 }
 
 /**
@@ -46,6 +61,7 @@ function current_user(): array {
         'id'         => $_SESSION['user_id'] ?? null,
         'username'   => $_SESSION['username'] ?? 'Guest',
         'email'      => $_SESSION['email'] ?? '',
+        'role'       => $_SESSION['role'] ?? 'user',
         'vocal_type' => $_SESSION['vocal_type'] ?? 'Vocalist'
     ];
 }
@@ -59,6 +75,25 @@ function current_user(): array {
 function require_auth(string $redirectUrl = 'login.php'): void {
     if (!is_logged_in()) {
         set_flash('warning', 'Please sign in to access this page.');
+        header("Location: {$redirectUrl}");
+        exit;
+    }
+}
+
+/**
+ * Guard administrator-only routes: redirect if not superadmin
+ *
+ * @param string $redirectUrl
+ * @return void
+ */
+function require_admin(string $redirectUrl = 'index.php'): void {
+    if (!is_logged_in()) {
+        set_flash('warning', 'Please sign in with administrator credentials.');
+        header("Location: login.php");
+        exit;
+    }
+    if (!is_admin()) {
+        set_flash('danger', 'Access Denied: Superadmin privileges required.');
         header("Location: {$redirectUrl}");
         exit;
     }

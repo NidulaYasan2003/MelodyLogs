@@ -1,7 +1,6 @@
 <?php
 /**
  * MelodyLogs - Post Editor (Create & Update)
- * Unified editor for creating new posts and editing existing user posts with strict authorization
  */
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/functions.php';
@@ -35,9 +34,9 @@ if ($postId > 0) {
         exit;
     }
 
-    // Strict Ownership Authorization Check
-    if ((int)$post['user_id'] !== current_user_id()) {
-        set_flash('danger', 'Unauthorized: You can only edit your own melody logs.');
+    // Strict Ownership / Admin Authorization Check
+    if ((int)$post['user_id'] !== current_user_id() && !is_admin()) {
+        set_flash('danger', 'Unauthorized: You do not have permission to edit this melody log.');
         header('Location: index.php');
         exit;
     }
@@ -91,27 +90,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $currentUserId = current_user_id();
 
             if ($isEditMode) {
-                // Update existing post (strict authorization check in WHERE clause)
-                $updateStmt = $pdo->prepare("
-                    UPDATE posts 
-                    SET title = :title,
-                        category = :category,
-                        summary = :summary,
-                        content = :content,
-                        cover_image_url = :cover_image_url,
-                        updated_at = NOW()
-                    WHERE id = :id AND user_id = :user_id
-                ");
+                // Update existing post
+                if (is_admin()) {
+                    $updateStmt = $pdo->prepare("
+                        UPDATE posts 
+                        SET title = :title,
+                            category = :category,
+                            summary = :summary,
+                            content = :content,
+                            cover_image_url = :cover_image_url,
+                            updated_at = NOW()
+                        WHERE id = :id
+                    ");
 
-                $success = $updateStmt->execute([
-                    'title'           => $title,
-                    'category'        => $category,
-                    'summary'         => $summary,
-                    'content'         => $content,
-                    'cover_image_url' => !empty($coverImageUrl) ? $coverImageUrl : null,
-                    'id'              => $postId,
-                    'user_id'         => $currentUserId
-                ]);
+                    $success = $updateStmt->execute([
+                        'title'           => $title,
+                        'category'        => $category,
+                        'summary'         => $summary,
+                        'content'         => $content,
+                        'cover_image_url' => !empty($coverImageUrl) ? $coverImageUrl : null,
+                        'id'              => $postId
+                    ]);
+                } else {
+                    $updateStmt = $pdo->prepare("
+                        UPDATE posts 
+                        SET title = :title,
+                            category = :category,
+                            summary = :summary,
+                            content = :content,
+                            cover_image_url = :cover_image_url,
+                            updated_at = NOW()
+                        WHERE id = :id AND user_id = :user_id
+                    ");
+
+                    $success = $updateStmt->execute([
+                        'title'           => $title,
+                        'category'        => $category,
+                        'summary'         => $summary,
+                        'content'         => $content,
+                        'cover_image_url' => !empty($coverImageUrl) ? $coverImageUrl : null,
+                        'id'              => $postId,
+                        'user_id'         => $currentUserId
+                    ]);
+                }
 
                 if ($success) {
                     set_flash('success', 'Your Melody Log has been updated successfully!');

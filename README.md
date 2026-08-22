@@ -65,59 +65,7 @@ Blog app/
 
 ---
 
-## 🚀 Quick Setup & Installation
 
-### 1. Database Setup (MySQL)
-1. Start your MySQL server (via **XAMPP**, **WAMP**, **Laragon**, or MySQL CLI).
-2. Open **phpMyAdmin** (`http://localhost/phpmyadmin`) or your MySQL terminal.
-3. Import the `schema.sql` file:
-   - In phpMyAdmin: Click **Import** -> Choose `schema.sql` -> Click **Go**.
-   - Or in terminal:
-     ```bash
-     mysql -u root -p < schema.sql
-     ```
-
-### 2. Environment Configuration
-Create a `.env` file in the root folder (or use the pre-generated one):
-```env
-APP_NAME="MelodyLogs"
-APP_ENV=development
-APP_DEBUG=true
-APP_URL=http://localhost:8000
-
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_NAME=melodylogs_db
-DB_USER=root
-DB_PASS=
-DB_CHARSET=utf8mb4
-```
-
-### 3. Run the Application
-You can run MelodyLogs using any of the following methods:
-
-#### Option A: PHP Built-in Server (Fastest)
-Open PowerShell or Terminal in the project directory:
-```bash
-php -S 127.0.0.1:8000
-```
-Then visit: `http://127.0.0.1:8000`
-
-#### Option B: XAMPP / WAMP / Laragon
-Move or symlink the project folder into `htdocs` (or `www`), then open:
-`http://localhost/Blog%20app/index.php`
-
----
-
-## 👥 Default Administrator Account
- 
- The database is initialized with a default platform administrator account:
- 
- | Email / Username | Password | Role |
- | :--- | :--- | :--- |
- | `admin@melodylogs.com` *(or `Admin`)* | `admin123` | Platform Administrator |
-
----
 
 ## 🛡️ Security Audit Highlights
 

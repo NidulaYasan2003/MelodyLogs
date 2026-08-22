@@ -79,5 +79,64 @@
 
     <!-- Bootstrap 5.3 Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <!-- Custom Theme Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Handle Hamburger Animation State
+            const mobileToggle = document.getElementById('mobileMenuToggle');
+            const navbarCollapse = document.getElementById('navbarMelody');
+            
+            if (mobileToggle && navbarCollapse) {
+                // Listen to Bootstrap's native collapse events
+                navbarCollapse.addEventListener('show.bs.collapse', () => {
+                    mobileToggle.setAttribute('aria-expanded', 'true');
+                });
+                
+                navbarCollapse.addEventListener('hide.bs.collapse', () => {
+                    mobileToggle.setAttribute('aria-expanded', 'false');
+                });
+            }
+
+            // Theme Toggle Logic
+            const themeBtns = document.querySelectorAll('.theme-toggle-btn');
+            const htmlElement = document.documentElement;
+            
+            const setTheme = (theme) => {
+                htmlElement.setAttribute('data-bs-theme', theme);
+                localStorage.setItem('melodylogs_theme', theme);
+                
+                themeBtns.forEach(btn => {
+                    const darkIcon = btn.querySelector('.theme-icon-dark');
+                    const lightIcon = btn.querySelector('.theme-icon-light');
+                    if (theme === 'light') {
+                        darkIcon.classList.add('d-none');
+                        lightIcon.classList.remove('d-none');
+                    } else {
+                        darkIcon.classList.remove('d-none');
+                        lightIcon.classList.add('d-none');
+                    }
+                });
+            };
+            
+            const savedTheme = localStorage.getItem('melodylogs_theme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                    setTheme('light');
+                } else {
+                    setTheme('dark');
+                }
+            }
+            
+            themeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const currentTheme = htmlElement.getAttribute('data-bs-theme');
+                    setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+                });
+            });
+        });
+    </script>
 </body>
 </html>

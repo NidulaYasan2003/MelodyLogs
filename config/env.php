@@ -1,8 +1,11 @@
 <?php
+/**
+ * MelodyLogs - Lightweight Environment Variables Loader
+ */
 
 if (!function_exists('load_env')) {
     /**
-     * Load environment variables from a given file path
+    
      *
      * @param string $filePath
      * @return bool
@@ -94,7 +97,7 @@ if (!function_exists('env')) {
     }
 }
 
-
+// Automatically load .env from the project root if it exists
 $envPath = dirname(__DIR__) . DIRECTORY_SEPARATOR . '.env';
 if (file_exists($envPath)) {
     load_env($envPath);

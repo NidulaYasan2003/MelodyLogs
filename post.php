@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * MelodyLogs - Single Post View
+ *  */
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/functions.php';
 
@@ -32,8 +34,8 @@ if (!$post) {
     exit;
 }
 
-// Check if current user is the author
-$isAuthor = is_logged_in() && (current_user_id() === (int)$post['user_id']);
+// Check if current user is the author or superadmin
+$canManage = is_logged_in() && ((current_user_id() === (int)$post['user_id']) || is_admin());
 
 $categories = get_vocal_categories();
 $catMeta = $categories[$post['category']] ?? ['icon' => 'bi-soundwave', 'badge' => 'badge-technique'];
@@ -53,8 +55,8 @@ require_once __DIR__ . '/includes/header.php';
                     <i class="bi bi-arrow-left me-1"></i> Back to Explore
                 </a>
 
-                <!-- Strict Author Controls (Visible ONLY to the Author) -->
-                <?php if ($isAuthor): ?>
+                <!-- Management Controls (Visible to Author or Admin) -->
+                <?php if ($canManage): ?>
                     <div class="d-flex align-items-center gap-2">
                         <a href="editor.php?id=<?= (int)$post['id'] ?>" class="btn btn-outline-warning btn-sm rounded-pill px-3">
                             <i class="bi bi-pencil me-1"></i> Edit Log
@@ -140,8 +142,8 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 </article>
 
-<!-- Delete Confirmation Modal (Owner Only) -->
-<?php if ($isAuthor): ?>
+<!-- Delete Confirmation Modal (Owner or Admin) -->
+<?php if ($canManage): ?>
     <div class="modal fade" id="deletePostModal" tabindex="-1" aria-labelledby="deletePostModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
